@@ -1,6 +1,6 @@
 use crate::objects::HitData;
 use crate::ray::Ray;
-use rand::rngs::StdRng;
+use rand::rngs::SmallRng;
 use rand::Rng;
 use rand_distr::UnitSphere;
 use ultraviolet::Vec3;
@@ -11,10 +11,17 @@ pub enum Material {
 }
 
 impl Material {
-    pub fn scatter_ray(&self, ray: &Ray, hit_data: &HitData, rng: &mut StdRng) -> RayScatterResult {
+    pub fn scatter_ray(
+        &self,
+        ray: &Ray,
+        hit_data: &HitData,
+        rng: &mut SmallRng,
+    ) -> RayScatterResult {
         match self {
             Material::DiffuseMaterial { albedo } => {
-                let target = hit_data.point + hit_data.normal + Vec3::from(rng.sample(UnitSphere));
+                let target = hit_data.point
+                    + hit_data.normal
+                    + Vec3::from(rng.gen::<[f32; 3]>()).normalized(); // Sample from surface of unit sphere
                 RayScatterResult::Scattered {
                     scattered_ray: Ray {
                         origin: hit_data.point,

@@ -10,3 +10,19 @@ impl Ray {
         self.direction.mul_add(Vec3::broadcast(z), self.origin)
     }
 }
+
+pub struct Camera {
+    pub origin: Vec3,
+    pub lower_left_corner: Vec3,
+    pub horizontal: Vec3,
+    pub vertical: Vec3,
+}
+
+impl Camera {
+    pub fn raycast(&self, u: f32, v: f32) -> Ray {
+        Ray {
+            origin: self.origin,
+            direction: self.lower_left_corner + (u * self.horizontal) + (v * self.vertical),
+        }
+    }
+}
