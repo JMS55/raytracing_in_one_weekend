@@ -26,6 +26,8 @@ pub struct Sphere {
     pub material: Box<dyn Material>,
 }
 
+unsafe impl Sync for Sphere {}
+
 impl Object for Sphere {
     fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitData> {
         let oc = ray.origin - self.center;
@@ -41,7 +43,7 @@ impl Object for Sphere {
                     t,
                     point,
                     normal: (point - self.center) / self.radius,
-                    material: self.material.clone(),
+                    material: &self.material,
                 });
             }
             t = (-b + discriminant.sqrt()) / a;
@@ -51,7 +53,7 @@ impl Object for Sphere {
                     t,
                     point,
                     normal: (point - self.center) / self.radius,
-                    material: self.material.clone(),
+                    material: &self.material,
                 });
             }
         }
@@ -59,13 +61,13 @@ impl Object for Sphere {
     }
 }
 
-pub trait Object {
+pub trait Object: Sync {
     fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitData>;
 }
 
-pub struct HitData {
+pub struct HitData<'a> {
     pub t: f32,
     pub point: Vec3,
     pub normal: Vec3,
-    pub material: Box<dyn Material>,
+    pub material: &'a Box<dyn Material>,
 }

@@ -5,6 +5,7 @@ edition = "2018"
 
 [dependencies]
 ultraviolet = "0.7"
+rayon = "1.5"
 rand = "0.8"
 rand_distr = "0.4"
 image = { version = "0.23", default-features = false, features = ["png"] }

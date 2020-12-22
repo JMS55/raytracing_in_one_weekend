@@ -20,12 +20,6 @@ impl Material for DiffuseMaterial {
             attenuation: self.albedo,
         }
     }
-
-    fn clone(&self) -> Box<dyn Material> {
-        Box::new(Self {
-            albedo: self.albedo,
-        })
-    }
 }
 
 pub struct MetalMaterial {
@@ -50,18 +44,10 @@ impl Material for MetalMaterial {
             RayScatterResult::Unscattered
         }
     }
-
-    fn clone(&self) -> Box<dyn Material> {
-        Box::new(Self {
-            albedo: self.albedo,
-            fuzziness: self.fuzziness,
-        })
-    }
 }
 
 pub trait Material {
     fn scatter_ray(&self, ray: &Ray, hit_data: &HitData, rng: &mut StdRng) -> RayScatterResult;
-    fn clone(&self) -> Box<dyn Material>;
 }
 
 pub enum RayScatterResult {

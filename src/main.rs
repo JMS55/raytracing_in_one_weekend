@@ -3,11 +3,12 @@ mod objects;
 mod ray;
 
 use crate::ray::Ray;
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{ImageBuffer, RgbImage};
 use materials::*;
 use objects::*;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+use rayon::prelude::{IntoParallelIterator, ParallelExtend, ParallelIterator};
 use ultraviolet::{Lerp, Vec3};
 
 const IMAGE_WIDTH: u32 = 1280;
@@ -15,9 +16,6 @@ const IMAGE_HEIGHT: u32 = 640;
 const SAMPLES_PER_PIXEL: u32 = 500;
 
 fn main() {
-    let mut image: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
-    let mut rng = StdRng::seed_from_u64(0);
-
     let camera = Camera {
         origin: Vec3::zero(),
         lower_left_corner: Vec3::new(-2.0, 1.0, -1.0),
@@ -60,21 +58,27 @@ fn main() {
         ],
     };
 
-    for x in 0..IMAGE_WIDTH {
-        for y in 0..IMAGE_HEIGHT {
-            let mut pixel = Vec3::zero();
-            for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (x as f32 + rng.gen::<f32>()) / IMAGE_WIDTH as f32;
-                let v = (y as f32 + rng.gen::<f32>()) / IMAGE_HEIGHT as f32;
-                let ray = camera.raycast(u, v);
-                pixel += color(&ray, &objects, 0, &mut rng);
-            }
-            pixel /= SAMPLES_PER_PIXEL as f32;
-            pixel = pixel.map(|c| c.sqrt()) * 255.99;
-            image.put_pixel(x, y, Rgb([pixel.x as u8, pixel.y as u8, pixel.z as u8]));
-        }
-    }
-
+    let mut image = Vec::with_capacity(IMAGE_WIDTH as usize * IMAGE_HEIGHT as usize);
+    image.par_extend(
+        (0..(IMAGE_WIDTH * IMAGE_HEIGHT))
+            .into_par_iter()
+            .flat_map_iter(|i| {
+                let x = i % IMAGE_WIDTH;
+                let y = i / IMAGE_WIDTH;
+                let mut rng = StdRng::seed_from_u64(x as u64 * y as u64);
+                let mut pixel = Vec3::zero();
+                for _ in 0..SAMPLES_PER_PIXEL {
+                    let u = (x as f32 + rng.gen::<f32>()) / IMAGE_WIDTH as f32;
+                    let v = (y as f32 + rng.gen::<f32>()) / IMAGE_HEIGHT as f32;
+                    let ray = camera.raycast(u, v);
+                    pixel += color(&ray, &objects, 0, &mut rng);
+                }
+                pixel /= SAMPLES_PER_PIXEL as f32;
+                pixel = pixel.map(|c| c.sqrt()) * 255.99;
+                vec![pixel.x as u8, pixel.y as u8, pixel.z as u8] // TODO: Replace with array when rust gets const generics
+            }),
+    );
+    let image: RgbImage = ImageBuffer::from_raw(IMAGE_WIDTH, IMAGE_HEIGHT, image).unwrap();
     image.save("image.png").unwrap();
 }
 
