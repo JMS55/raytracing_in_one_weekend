@@ -7,5 +7,4 @@ edition = "2018"
 ultraviolet = "0.7"
 rayon = "1.5"
 rand = { version = "0.8", features = ["small_rng"] }
-rand_distr = "0.4"
 image = { version = "0.23", default-features = false, features = ["png"] }

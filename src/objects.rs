@@ -37,33 +37,39 @@ impl Object {
                 material,
             } => {
                 let oc = ray.origin - *center;
-                let a = ray.direction.dot(ray.direction);
-                let b = oc.dot(ray.direction);
-                let c = oc.dot(oc) - (radius * radius);
-                let discriminant = (b * b) - (a * c);
-                if discriminant > 0.0 {
-                    let mut t = (-b - discriminant.sqrt()) / a;
-                    if t < t_max && t > t_min {
-                        let point = ray.at_distance(t);
-                        return Some(HitData {
-                            t,
-                            point,
-                            normal: (point - *center) / *radius,
-                            material: &material,
-                        });
-                    }
-                    t = (-b + discriminant.sqrt()) / a;
-                    if t < t_max && t > t_min {
-                        let point = ray.at_distance(t);
-                        return Some(HitData {
-                            t,
-                            point,
-                            normal: (point - *center) / *radius,
-                            material: &material,
-                        });
+                let a = ray.direction.mag_sq();
+                let half_b = oc.dot(ray.direction);
+                let c = oc.mag_sq() - (radius * radius);
+
+                let discriminant = (half_b * half_b) - (a * c);
+                if discriminant < 0.0 {
+                    return None;
+                }
+                let sqrtd = discriminant.sqrt();
+
+                let mut root = (-half_b - sqrtd) / a;
+                if root < t_min || t_max < root {
+                    root = (-half_b + sqrtd) / a;
+                    if root < t_min || t_max < root {
+                        return None;
                     }
                 }
-                return None;
+
+                let point = ray.at_distance(root);
+                let outward_normal = (point - *center) / *radius;
+                let front_face = ray.direction.dot(outward_normal) < 0.0;
+                let normal = if front_face {
+                    outward_normal
+                } else {
+                    -outward_normal
+                };
+                Some(HitData {
+                    t: root,
+                    point,
+                    normal,
+                    front_face,
+                    material,
+                })
             }
         }
     }
@@ -73,5 +79,6 @@ pub struct HitData<'a> {
     pub t: f32,
     pub point: Vec3,
     pub normal: Vec3,
+    pub front_face: bool,
     pub material: &'a Material,
 }
