@@ -1,5 +1,3 @@
-* Figure out why shadows aren't circular
-* Implement dielectrics
 * Stratified sampling
 * Cleanup and comment code
 * Use rand::distributions::Uniform

@@ -32,17 +32,31 @@ fn main() {
     let objects = ObjectList {
         objects: vec![
             Object::Sphere {
-                center: Vec3::new(0.0, 0.0, -1.0),
-                radius: 0.5,
-                material: Material::Diffuse {
-                    albedo: Vec3::new(0.5, 0.5, 0.5),
-                },
-            },
-            Object::Sphere {
                 center: Vec3::new(0.0, -100.5, -1.0),
                 radius: 100.0,
                 material: Material::Diffuse {
                     albedo: Vec3::new(1.0, 0.5, 1.0),
+                },
+            },
+            Object::Sphere {
+                center: Vec3::new(-1.0, 0.0, -1.0),
+                radius: 0.5,
+                material: Material::Dielectric {
+                    index_of_refraction: 1.5,
+                },
+            },
+            Object::Sphere {
+                center: Vec3::new(-1.0, 0.0, -1.0),
+                radius: -0.4,
+                material: Material::Dielectric {
+                    index_of_refraction: 1.5,
+                },
+            },
+            Object::Sphere {
+                center: Vec3::new(0.0, 0.0, -1.0),
+                radius: 0.5,
+                material: Material::Diffuse {
+                    albedo: Vec3::new(0.5, 0.5, 0.5),
                 },
             },
             Object::Sphere {
@@ -53,15 +67,9 @@ fn main() {
                     fuzziness: 0.3,
                 },
             },
-            // Object::Sphere {
-            //     center: Vec3::new(-1.0, 0.0, -1.0),
-            //     radius: 0.5,
-            //     material: Material::Dielectric {
-            //         index_of_refraction: 1.5,
-            //     },
-            // },
         ],
     };
+
     raytrace(camera, objects);
 }
 
