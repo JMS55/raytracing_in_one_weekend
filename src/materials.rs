@@ -69,7 +69,11 @@ pub enum RayScatterResult {
 
 fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
     loop {
-        let p = Vec3::from(rng.gen::<[f32; 3]>());
+        let p = Vec3::new(
+            rng.gen_range(-1.0..=1.0),
+            rng.gen_range(-1.0..=1.0),
+            rng.gen_range(-1.0..=1.0),
+        );
         if p.mag_sq() < 1.0 {
             break p;
         }

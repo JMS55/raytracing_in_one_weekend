@@ -71,23 +71,16 @@ fn generate_scene() -> ObjectList {
     for a in -11..11 {
         for b in -11..11 {
             let center = Vec3::new(
-                a as f32 + 0.9 * rng.gen_range(0.0..1.0),
+                a as f32 + 0.9 * rng.gen::<f32>(),
                 0.2,
-                b as f32 + 0.9 * rng.gen_range(0.0..1.0),
+                b as f32 + 0.9 * rng.gen::<f32>(),
             );
             if (center - Vec3::new(4.0, 0.2, 0.0)).mag() > 0.9 {
-                let material_choice = rng.gen_range(0.0..1.0);
+                let material_choice = rng.gen::<f32>();
                 let material = if material_choice < 0.8 {
                     Material::Diffuse {
-                        albedo: Vec3::new(
-                            rng.gen_range(0.0..1.0),
-                            rng.gen_range(0.0..1.0),
-                            rng.gen_range(0.0..1.0),
-                        ) * Vec3::new(
-                            rng.gen_range(0.0..1.0),
-                            rng.gen_range(0.0..1.0),
-                            rng.gen_range(0.0..1.0),
-                        ),
+                        albedo: Vec3::new(rng.gen(), rng.gen(), rng.gen())
+                            * Vec3::new(rng.gen(), rng.gen(), rng.gen()),
                     }
                 } else if material_choice < 0.95 {
                     Material::Metal {
@@ -125,8 +118,8 @@ fn raytrace(camera: Camera, objects: ObjectList) {
                 let mut rng = SmallRng::seed_from_u64(i as u64);
                 let mut pixel = Vec3::zero();
                 for _ in 0..SAMPLES_PER_PIXEL {
-                    let u = (x as f32 + rng.gen_range(0.0..1.0)) / (IMAGE_WIDTH as f32 - 1.0);
-                    let v = (y as f32 + rng.gen_range(0.0..1.0)) / (IMAGE_HEIGHT as f32 - 1.0);
+                    let u = (x as f32 + rng.gen::<f32>()) / (IMAGE_WIDTH as f32 - 1.0);
+                    let v = (y as f32 + rng.gen::<f32>()) / (IMAGE_HEIGHT as f32 - 1.0);
                     let ray = camera.raycast(u, v);
                     pixel += color(&ray, &objects, 0, &mut rng);
                 }
