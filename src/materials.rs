@@ -5,9 +5,17 @@ use rand::Rng;
 use ultraviolet::Vec3;
 
 pub enum Material {
-    Diffuse { albedo: Vec3 },
-    Metal { albedo: Vec3, fuzziness: f32 },
-    Dielectric { index_of_refraction: f32 },
+    Diffuse {
+        albedo: Vec3,
+    },
+    Metal {
+        albedo: Vec3,
+        fuzziness: f32,
+    },
+    Dielectric {
+        albedo: Vec3,
+        index_of_refraction: f32,
+    },
 }
 
 impl Material {
@@ -49,6 +57,7 @@ impl Material {
             }
 
             Material::Dielectric {
+                albedo,
                 index_of_refraction,
             } => {
                 let refraction_ratio = if hit_data.front_face {
@@ -74,7 +83,7 @@ impl Material {
                         origin: hit_data.point,
                         direction,
                     },
-                    attenuation: Vec3::new(1.0, 1.0, 1.0),
+                    attenuation: *albedo,
                 }
             }
         }

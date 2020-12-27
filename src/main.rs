@@ -42,6 +42,7 @@ fn main() {
                 center: Vec3::new(-1.0, 0.0, -1.0),
                 radius: 0.5,
                 material: Material::Dielectric {
+                    albedo: Vec3::new(0.7, 0.0, 0.0),
                     index_of_refraction: 1.5,
                 },
             },
@@ -49,6 +50,7 @@ fn main() {
                 center: Vec3::new(-1.0, 0.0, -1.0),
                 radius: -0.4,
                 material: Material::Dielectric {
+                    albedo: Vec3::one(),
                     index_of_refraction: 1.5,
                 },
             },
@@ -101,6 +103,7 @@ fn generate_scene() -> ObjectList {
                     }
                 } else {
                     Material::Dielectric {
+                        albedo: Vec3::one(),
                         index_of_refraction: 1.5,
                     }
                 };

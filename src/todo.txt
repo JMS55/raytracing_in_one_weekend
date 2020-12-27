@@ -1,3 +1,6 @@
+* Implement rest of book
 * Stratified sampling
+* Triangles and models
+* Textures
 * Cleanup and comment code
 * Use rand::distributions::Uniform
