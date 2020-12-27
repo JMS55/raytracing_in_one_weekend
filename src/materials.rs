@@ -1,3 +1,5 @@
+use std::todo;
+
 use crate::objects::HitData;
 use crate::ray::Ray;
 use rand::rngs::SmallRng;
@@ -19,8 +21,7 @@ impl Material {
     ) -> RayScatterResult {
         match self {
             Material::Diffuse { albedo } => {
-                let mut direction =
-                    hit_data.normal + Vec3::from(rng.gen::<[f32; 3]>()).normalized();
+                let mut direction = hit_data.normal + random_in_unit_sphere(rng).normalized();
                 if direction.x < 1e-8 && direction.y < 1e-8 && direction.z < 1e-8 {
                     direction = hit_data.normal;
                 }
@@ -34,17 +35,10 @@ impl Material {
             }
 
             Material::Metal { albedo, fuzziness } => {
-                let v = ray.direction.normalized();
-                let reflection_direction = v - 2.0 * v.dot(hit_data.normal) * hit_data.normal;
-                let random_in_unit_sphere = loop {
-                    let p = Vec3::from(rng.gen::<[f32; 3]>());
-                    if p.mag_sq() < 1.0 {
-                        break p;
-                    }
-                };
+                let reflection_direction = reflect(ray.direction.normalized(), hit_data.normal);
                 let scattered_ray = Ray {
                     origin: hit_data.point,
-                    direction: reflection_direction + *fuzziness * random_in_unit_sphere,
+                    direction: reflection_direction + *fuzziness * random_in_unit_sphere(rng),
                 };
                 if scattered_ray.direction.dot(hit_data.normal) > 0.0 {
                     RayScatterResult::Scattered {
@@ -71,4 +65,18 @@ pub enum RayScatterResult {
         scattered_ray: Ray,
         attenuation: Vec3,
     },
+}
+
+fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
+    loop {
+        let p = Vec3::from(rng.gen::<[f32; 3]>());
+        if p.mag_sq() < 1.0 {
+            break p;
+        }
+    }
+}
+
+// Modifies a ray to bounce off a surface
+fn reflect(v: Vec3, normal: Vec3) -> Vec3 {
+    v - (2.0 * v.dot(normal) * normal)
 }

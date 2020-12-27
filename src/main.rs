@@ -19,7 +19,7 @@ const MAX_DEPTH: u32 = 50;
 fn main() {
     let origin = Vec3::zero();
     let horizontal = Vec3::new((16.0 / 9.0) * 2.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, -2.0, 0.0);
+    let vertical = Vec3::new(0.0, 2.0, 0.0);
     let lower_left_corner = origin - (horizontal / 2.0) - (vertical / 2.0) - Vec3::unit_z();
     let camera = Camera {
         origin,
@@ -42,7 +42,7 @@ fn main() {
                 center: Vec3::new(0.0, -100.5, -1.0),
                 radius: 100.0,
                 material: Material::Diffuse {
-                    albedo: Vec3::new(1.0, 1.0, 1.0),
+                    albedo: Vec3::new(1.0, 0.5, 1.0),
                 },
             },
             Object::Sphere {
@@ -121,7 +121,7 @@ fn raytrace(camera: Camera, objects: ObjectList) {
             .into_par_iter()
             .flat_map_iter(|i| {
                 let x = i % IMAGE_WIDTH;
-                let y = i / IMAGE_WIDTH;
+                let y = IMAGE_HEIGHT - i / IMAGE_WIDTH;
                 let mut rng = SmallRng::seed_from_u64(i as u64);
                 let mut pixel = Vec3::zero();
                 for _ in 0..SAMPLES_PER_PIXEL {
